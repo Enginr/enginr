@@ -1,0 +1,6 @@
+routes/
+middlewares/
+views/
+public/
+
+/app.php
