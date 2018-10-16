@@ -146,6 +146,30 @@ class Socket {
     }
 
     /**
+     * Return a strucutre of host and port of the socket speficied
+     * 
+     * @param resource $socket A socket to get peer name
+     * 
+     * @throws SocketException If the socket is not a type of resource
+     * @throws SocketException If the peer name could not be retreived
+     * 
+     * @return object An object of [host, port]
+     */
+    public function getPeerName($socket): object {
+        $host = null;
+        $port = null;
+        
+        if (!is_resource($socket))
+            throw new SocketException('1st parameter must be a type of resource. ' . 
+            gettype($socket) . ' given.');
+
+        if (!socket_getpeername($socket, $host, $port))
+            throw new SocketException('Could not get socket peer name.');
+
+        return (object)['host' => $host, 'port' => $port];
+    }
+
+    /**
      * Close a socket
      * 
      * @param resource &$socket A socket address to free

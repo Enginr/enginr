@@ -47,7 +47,7 @@ class Enginr extends \Enginr\Router {
         if ($handler) $handler();
 
         $this->_server->watch(function ($client, string $buffer): void {
-            Console::log('New connection from : ' . $client);
+            Console::log($this->_server->getPeerName($client));
         });
     }
 }
