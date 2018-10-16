@@ -1,6 +1,14 @@
 <?php
 
-namespace Enginr;
+/**
+ * @license MIT
+ * @link https://opensource.org/licenses/MIT The MIT License
+ * 
+ * @author Arthuchaut
+ * @link https://github.com/Arthuchaut
+ */
+
+namespace Enginr\Console;
 
 class Console {
     /**

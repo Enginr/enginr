@@ -1,8 +1,16 @@
 <?php
 
+/**
+ * @license MIT
+ * @link https://opensource.org/licenses/MIT The MIT License
+ * 
+ * @author Arthuchaut
+ * @link https://github.com/Arthuchaut
+ */
+
 namespace Enginr;
 
-use Enginr\SocketException;
+use Enginr\Exception\SocketException;
 
 class Socket {
     /**
@@ -10,42 +18,42 @@ class Socket {
      * 
      * @var int A protocol family 
      */
-    const DOMAIN     = AF_INET;
+    const DOMAIN = AF_INET;
 
     /**
      * The socket communcation type
      * 
      * @var int A communication type
      */
-    const TYPE       = SOCK_STREAM;
+    const TYPE = SOCK_STREAM;
 
     /**
      * The socket protocol used for
      * 
      * @var int A protocol
      */
-    const PROTOCOL   = SOL_TCP;
+    const PROTOCOL = SOL_TCP;
 
     /**
      * The protocol level
      * 
      * @var int A protocol level
      */
-    const OPTLVL     = SOL_SOCKET;
+    const OPTLVL = SOL_SOCKET;
 
     /**
      * The socket option name
      * 
      * @var int A socket option name
      */
-    const OPTNAME    = SO_REUSEADDR;
+    const OPTNAME = SO_REUSEADDR;
 
     /**
      * The socket option value
      * 
      * @var mixed A socket option value
      */
-    const OPTVAL     = 1;
+    const OPTVAL = 1;
 
     /**
      * The maximum of incomming connection 
@@ -53,7 +61,7 @@ class Socket {
      * 
      * @var int A maximum incomming connection
      */
-    const BACKLOG    = SOMAXCONN;
+    const BACKLOG = SOMAXCONN;
 
     /**
      * The maximum byte length of the readed buffer
@@ -79,7 +87,7 @@ class Socket {
      * @return void
      */
     public function create(): void {
-        if (!$this->_socket = socket_create(self::DOMAIN, self::TYPE, self::PROTOCOL))
+        if (!$this->_socket = @socket_create(self::DOMAIN, self::TYPE, self::PROTOCOL))
             throw new SocketException(SocketException::err($this->_socket));
     }
 
@@ -95,7 +103,7 @@ class Socket {
      * @return void
      */
     public function set(int $optlvl, int $optname, int $optval): void {
-        if (!socket_set_option($this->_socket, $optlvl, $optname, $optval))
+        if (!@socket_set_option($this->_socket, $optlvl, $optname, $optval))
             throw new SocketException(SocketException::err($this->_socket));
     }
 
@@ -112,10 +120,10 @@ class Socket {
      * @return void
      */
     public function bind(string $host, int $port): void {
-        if (!socket_bind($this->_socket, $host, $port))
+        if (!@socket_bind($this->_socket, $host, $port))
             throw new SocketException(SocketException::err($this->_socket));
 
-        if (!socket_listen($this->_socket, self::BACKLOG))
+        if (!@socket_listen($this->_socket, self::BACKLOG))
             throw new SocketException(SocketException::err($this->_socket));
     }
 
@@ -127,7 +135,7 @@ class Socket {
      * @return void
      */
     public function watch(callable $handler): void {
-        if ($client = @socket_accept($this->_socket)) {
+        if ($client = socket_accept($this->_socket)) {
             if ($buffer = socket_read($client, self::BUFFER_LEN)) {
                 $handler($client, $buffer);
                 $this->close($client);
@@ -140,12 +148,18 @@ class Socket {
     /**
      * Close a socket
      * 
-     * @param resource $socket A socket to free
+     * @param resource &$socket A socket address to free
+     * 
+     * @throws SocketException If the socket is not a type of resource
      * 
      * @return void
      */
-    public function close($socket): void {
+    public function close(&$socket): void {
+        if (!is_resource($socket))
+            throw new SocketException('1st parameter must be a type of resource. ' . 
+            gettype($socket) . ' given.');
+
         socket_close($socket);
-        unset($socket);
+        $socket = null;
     }
 }
