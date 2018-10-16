@@ -131,6 +131,8 @@ class Socket {
      * Watch incomming connection and process it
      * 
      * @param callable $handler A callback function to process incomming connection
+     *      @param resource $client A client requester
+     *      @param string $buffer A data sent from the client
      * 
      * @return void
      */
@@ -155,7 +157,7 @@ class Socket {
      * 
      * @return object An object of [host, port]
      */
-    public function getPeerName($socket): object {
+    public static function getPeerName($socket): object {
         $host = null;
         $port = null;
         

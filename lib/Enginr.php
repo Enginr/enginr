@@ -10,9 +10,11 @@
 
 namespace Enginr;
 
+use Enginr\{Router, Socket};
+use Enginr\Http\{Request, Response};
 use Enginr\Console\Console;
 
-class Enginr extends \Enginr\Router {
+class Enginr extends Router {
     /**
      * The TCP socket server
      * 
@@ -28,7 +30,7 @@ class Enginr extends \Enginr\Router {
      * @return void
      */
     public function __construct() {
-        $this->_server = new \Enginr\Socket();
+        $this->_server = new Socket();
     }
 
     /**
@@ -42,12 +44,14 @@ class Enginr extends \Enginr\Router {
      */
     public function listen(string $host, int $port, callable $handler = NULL): void {
         $this->_server->create();
+        $this->_server->set(Socket::OPTLVL, Socket::OPTNAME, Socket::OPTVAL);
         $this->_server->bind($host, $port);
 
         if ($handler) $handler();
 
         $this->_server->watch(function ($client, string $buffer): void {
-            Console::log($this->_server->getPeerName($client));
+            Console::log(new Request($client, $buffer));
+            // Console::log(new Response($client));
         });
     }
 }
