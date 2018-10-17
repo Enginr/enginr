@@ -53,7 +53,7 @@ class Enginr extends Router {
             $req = new Request($client, $buffer);
             $res = new Response($client);
 
-            $res->send(['name' => 'Arthuchaut']);
+            $res->send('<h1>Hello !</h1>');
         });
     }
 }

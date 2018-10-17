@@ -3,30 +3,10 @@
 namespace Enginr\Http;
 
 use Enginr\Socket;
+use Enginr\Http\Http;
 use Enginr\Exception\RequestException;
 
 class Request {
-    /**
-     * The HTTP end of line characters
-     * 
-     * @var string An EOL characters
-     */
-    const CRLF = "\r\n";
-
-    /**
-     * The space character
-     * 
-     * @var char A space character
-     */
-    const SP = ' ';
-
-    /**
-     * The HTTP header separator
-     * 
-     * @var string An HTTP header separator
-     */
-    const HSEP = ': ';
-
     /**
      * The client request method
      * 
@@ -107,9 +87,9 @@ class Request {
         if (!is_resource($client))
             throw new RequestException('1st parameter must be a type of resource.');
 
-        $buffer = explode(self::CRLF.self::CRLF, $buffer);
-        $lines = explode(self::CRLF, $buffer[0]);
-        $startline = explode(self::SP, $lines[0]);
+        $buffer = explode(Http::CRLF.Http::CRLF, $buffer);
+        $lines = explode(Http::CRLF, $buffer[0]);
+        $startline = explode(' ', $lines[0]);
     
         $this->method = $startline[0];
         $this->uri = $startline[1];
@@ -131,7 +111,7 @@ class Request {
         $parsedHeaders = [];
 
         foreach ($headers as $peer) {
-            $peer = explode(self::HSEP, $peer);
+            $peer = explode(': ', $peer);
             $parsedHeaders[$peer[0]] = $peer[1];
         }
 
