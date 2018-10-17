@@ -140,11 +140,29 @@ class Socket {
         if ($client = socket_accept($this->_socket)) {
             if ($buffer = socket_read($client, self::BUFFER_LEN)) {
                 $handler($client, $buffer);
-                $this->close($client);
             }
         }
 
         $this->watch($handler);
+    }
+
+    /**
+     * Write to a socket
+     * 
+     * @param resource $socket A receiver socket
+     * @param string $buffer A message to send to the socket
+     * 
+     * @throws SocketException If $socket is not a type of resource
+     * @throws SocketException If the message could not be sent
+     * 
+     * @return void
+     */
+    public static function write($socket, string $buffer): void {
+        if (!is_resource($socket))
+            throw new SocketException('1st parameter must be a type of resource.');
+
+        if (!socket_write($socket, $buffer))
+            throw new SocketException('Unable to write to the socket.');
     }
 
     /**
@@ -162,8 +180,7 @@ class Socket {
         $port = null;
         
         if (!is_resource($socket))
-            throw new SocketException('1st parameter must be a type of resource. ' . 
-            gettype($socket) . ' given.');
+            throw new SocketException('1st parameter must be a type of resource.');
 
         if (!socket_getpeername($socket, $host, $port))
             throw new SocketException('Could not get socket peer name.');
@@ -182,8 +199,7 @@ class Socket {
      */
     public function close(&$socket): void {
         if (!is_resource($socket))
-            throw new SocketException('1st parameter must be a type of resource. ' . 
-            gettype($socket) . ' given.');
+            throw new SocketException('1st parameter must be a type of resource.');
 
         socket_close($socket);
         $socket = null;

@@ -50,8 +50,10 @@ class Enginr extends Router {
         if ($handler) $handler();
 
         $this->_server->watch(function ($client, string $buffer): void {
-            Console::log(new Request($client, $buffer));
-            // Console::log(new Response($client));
+            $req = new Request($client, $buffer);
+            $res = new Response($client);
+
+            $res->send(['name' => 'Arthuchaut']);
         });
     }
 }
