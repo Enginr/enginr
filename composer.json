@@ -1,0 +1,18 @@
+{
+    "name": "enginr/enginr",
+    "description": "A lightweight PHP solution to creating easily PHP applications.",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "RC",
+    "require": {
+        "php": ">=7.2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Enginr\\": "lib/"
+        }
+    }
+}
