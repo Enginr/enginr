@@ -1,6 +1,14 @@
+# Specific to development environments
+.idea/
+.vscode/
+.vs/
+.DS_Store
+
+
+# Spcific to Enginr
 routes/
 middlewares/
 views/
 public/
-
+vendor/
 /app.php
