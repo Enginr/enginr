@@ -51,14 +51,12 @@ class Enginr extends Router {
         if ($handler) $handler();
 
         $this->_server->watch(function ($client, string $buffer): void {
-            $req = new Request($client, $buffer);
-            $res = new Response($client);
-
-            if ($this->_routes[$req->method][$req->uri])
-                if (is_array($this->_routes[$req->method][$req->uri]))
-                    foreach ($this->_routes[$req->method][$req->uri] as $handler)
-                        $handler($req, $res);
-            else $res->end("Cannot $req->method $req->uri");
+            $this->_process(
+                new Request($client, $buffer),
+                new Response($client)
+            );
         });
+
+        $this->_server->close();
     }
 }

@@ -175,7 +175,7 @@ class Socket {
      * 
      * @return object An object of [host, port]
      */
-    public static function getPeerName($socket): object {
+    public function getPeerName($socket): object {
         $host = null;
         $port = null;
         
@@ -190,14 +190,21 @@ class Socket {
 
     /**
      * Close a socket
+     * If not socket specified, then close the main socket
      * 
-     * @param resource &$socket A socket address to free
+     * @param resource (optional) &$socket A socket address to free
      * 
      * @throws SocketException If the socket is not a type of resource
      * 
      * @return void
      */
-    public function close(&$socket): void {
+    public function close(&$socket = NULL): void {
+        if (!$socket) {
+            socket_close($this->_socket);
+            $this->_socket = null;
+            return;
+        }
+
         if (!is_resource($socket))
             throw new SocketException('1st parameter must be a type of resource.');
 

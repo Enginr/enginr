@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @license MIT
+ * @link https://opensource.org/licenses/MIT The MIT License
+ * 
+ * @author Arthuchaut
+ * @link https://github.com/Arthuchaut
+ */
+
 namespace Enginr\Http;
 
 use Enginr\Socket;
@@ -71,7 +79,7 @@ class Response {
                     if ($i < count($values) - 1) $headers .= ',';
                 }
             } else $headers .= $values;
-            
+
             $headers .= Http::CRLF;
         }
 
