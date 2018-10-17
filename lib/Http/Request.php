@@ -87,17 +87,18 @@ class Request {
         if (!is_resource($client))
             throw new RequestException('1st parameter must be a type of resource.');
 
-        $buffer = explode(Http::CRLF.Http::CRLF, $buffer);
-        $lines = explode(Http::CRLF, $buffer[0]);
+        $buffer    = explode(Http::CRLF.Http::CRLF, $buffer);
+        $lines     = explode(Http::CRLF, $buffer[0]);
         $startline = explode(' ', $lines[0]);
+        $peerName  = Socket::getPeerName($client);
     
-        $this->method = $startline[0];
-        $this->uri = $startline[1];
+        $this->method  = $startline[0];
+        $this->uri     = $startline[1];
         $this->version = $startline[2];
         $this->headers = $this->_parseHeaders(array_splice($lines, 1, count($lines)));
-        $this->body = $buffer[1];
-        $this->host = Socket::getPeerName($client)->host;
-        $this->port = Socket::getPeerName($client)->port;
+        $this->body    = $buffer[1];
+        $this->host    = $peerName->host;
+        $this->port    = $peerName->port;
     }
 
     /**

@@ -68,12 +68,10 @@ class Response {
             if (is_array($values)) {
                 foreach ($values as $i => $value) {
                     $headers .= $value;
-
-                    if ($i < count($values) - 1)
-                        $headers .= ','; 
+                    if ($i < count($values) - 1) $headers .= ',';
                 }
             } else $headers .= $values;
-
+            
             $headers .= Http::CRLF;
         }
 

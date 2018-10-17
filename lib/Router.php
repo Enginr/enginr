@@ -16,7 +16,7 @@ class Router {
      * 
      * @var array A collection of routes
      */
-    private $_routes;
+    protected $_routes;
 
     /**
      * The Router constructor
@@ -26,6 +26,16 @@ class Router {
      * @return void
      */
     public function __construct() {
-        $this->_routes = [];
+        $this->_routes = [
+            'GET'     => [],
+            'POST'    => [],
+            'PUT'     => [],
+            'DELETE'  => [],
+            'PATCH'   => []
+        ];
+    }
+
+    public function get(string $uri, callable ...$handlers): void {
+        $this->_routes['GET'][] = $handlers;
     }
 }

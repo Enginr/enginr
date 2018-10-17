@@ -31,6 +31,7 @@ class Enginr extends Router {
      */
     public function __construct() {
         $this->_server = new Socket();
+        parent::__construct();
     }
 
     /**
@@ -53,7 +54,11 @@ class Enginr extends Router {
             $req = new Request($client, $buffer);
             $res = new Response($client);
 
-            $res->send('<h1>Hello !</h1>');
+            if ($this->_routes[$req->method][$req->uri])
+                if (is_array($this->_routes[$req->method][$req->uri]))
+                    foreach ($this->_routes[$req->method][$req->uri] as $handler)
+                        $handler($req, $res);
+            else $res->end("Cannot $req->method $req->uri");
         });
     }
 }
