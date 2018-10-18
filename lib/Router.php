@@ -187,7 +187,11 @@ class Router {
         foreach ($router->_routes as $method => $uris) {
             foreach ($uris as $uri => $handlers) {
                 if (strlen($uri) === 1 && strlen($ruri)) $uri = '';
-                $this->_routes[$method][$ruri . $uri] = $handlers;
+
+                if (array_key_exists($ruri . $uri, $this->_routes)) {
+                    foreach ($handlers as $handler)
+                        $this->_routes[$method][$ruri . $uri][] = $handler;
+                } else $this->_routes[$method][$ruri . $uri] = $handlers;
             }
         }
 
