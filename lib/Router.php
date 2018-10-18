@@ -12,7 +12,7 @@ namespace Enginr;
 
 use Enginr\Http\{Request, Response};
 use Enginr\Exception\RouterException;
-use Enginr\Console\Console;
+use Enginr\System\System;
 
 class Router {
     /**
@@ -120,23 +120,25 @@ class Router {
      * Implement middlewares
      * 
      * This method accept 2 types of middlewares :
-     *      1. A pair of root URI -> Router
-     *      A root URI is combined with the URIs specified in the Router
+     *      1. A peer of [root uri] > [Router]
+     *      A root uri is combined with the uris specified in the Router
      * 
      *      2. An array of callables
      *      Before any request process, this handlers will be called first.
      *      Then, the peer of Request/Response will be transfered to classical process route
      * 
-     * First type of middleware accepted :
-     * 
-     * @param string A root URI which all uris will be concatenated
+     * The first type of middleware accepted :
+     * @param string A root uri which all uris will be concatenated
      * @param Router A Router to merge it with this Router
      * 
-     * Second type of middleware accepted :
-     * 
+     * The second type of middleware accepted :
      * @param callable[] An array of handlers that take a Request and Response
      *      @param Request An HTTP request
      *      @param Response A response module
+     * 
+     * @throws RouterException If the first configuration has only 1 argument
+     * @throws RouterException If the first configuration has not a Router at it second parameter
+     * @throws RouterException If the second configuration has an other type than callable
      * 
      * @return self
      */
@@ -145,7 +147,8 @@ class Router {
 
         if (gettype(func_get_arg(0)) === 'string') {
             if ($nargs === 1)
-                throw new RouterException('This middleware config need a Router to work.');
+                throw new RouterException('This middleware configuration ' .
+                'need a second parameter that is a Router to work.');
 
             if (gettype(func_get_arg(1)) === 'object' && 
                 get_class(func_get_arg(1)) !== 'Enginr\Router')
@@ -171,10 +174,15 @@ class Router {
     /**
      * Merde a Router with this Router
      * 
+     * (test) If the method and uri already exist,
+     * the handlers will be added the the route
+     * 
      * @see Router::use() method
      * 
-     * @param string $ruri A root URI
+     * @param string $ruri A root uri
      * @param Router $router A Router object
+     * 
+     * @throws RouterException If $ruri not begin with /
      * 
      * @return void
      */
@@ -188,7 +196,7 @@ class Router {
             foreach ($uris as $uri => $handlers) {
                 if (strlen($uri) === 1 && strlen($ruri)) $uri = '';
 
-                if (array_key_exists($ruri . $uri, $this->_routes)) {
+                if (array_key_exists($ruri . $uri, $this->_routes[$method])) {
                     foreach ($handlers as $handler)
                         $this->_routes[$method][$ruri . $uri][] = $handler;
                 } else $this->_routes[$method][$ruri . $uri] = $handlers;

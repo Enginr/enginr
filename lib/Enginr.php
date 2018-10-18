@@ -12,7 +12,7 @@ namespace Enginr;
 
 use Enginr\{Router, Socket};
 use Enginr\Http\{Http, Request, Response};
-use Enginr\Console\Console;
+use Enginr\System\System;
 use Enginr\Exception\EnginrException;
 
 class Enginr extends Router {
@@ -24,6 +24,13 @@ class Enginr extends Router {
     private $_server;
 
     /**
+     * The view path root
+     * 
+     * @var string A view path root
+     */
+    private $_view;
+
+    /**
      * The Enginr constructor
      * 
      * @param void
@@ -32,6 +39,7 @@ class Enginr extends Router {
      */
     public function __construct() {
         $this->_server = new Socket();
+        $this->_view = '';
         parent::__construct();
     }
 
@@ -54,7 +62,7 @@ class Enginr extends Router {
         $this->_server->watch(function ($client, string $buffer): void {
             $this->_process(
                 new Request($client, $buffer),
-                new Response($client)
+                new Response($client, $this->_view)
             );
         });
 
@@ -93,5 +101,22 @@ class Enginr extends Router {
         }
 
         return $router;
+    }
+
+    /**
+     * Set propterties Enginr
+     * 
+     * @param string $prop A propertie to set
+     * @param string $value A value to allocate to the propertie
+     * 
+     * @throws EnginrException If $prop is not referenced
+     * 
+     * @return void
+     */
+    public function set(string $prop, string $value): void {
+        if (!property_exists($this, "_$prop"))
+            throw new EnginrException("Unknow propertie $prop");
+
+        $this->{"_$prop"} = $value;
     }
 }

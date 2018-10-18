@@ -13,7 +13,7 @@ namespace Enginr\Http;
 use Enginr\Socket;
 use Enginr\Http\Http;
 use Enginr\Exception\ResponseException;
-use Enginr\Console\Console;
+use Enginr\System\System;
 
 class Response {
     /**
@@ -38,6 +38,13 @@ class Response {
     private $_headers;
 
     /**
+     * The view path root
+     * 
+     * @var string A view path root
+     */
+    private $_view;
+
+    /**
      * The response constructor
      * 
      * @param resource $client A socket resource
@@ -46,11 +53,12 @@ class Response {
      * 
      * @return void
      */
-    public function __construct($client) {
+    public function __construct($client, string $view) {
         if (!is_resource($client))
             throw new ResponseException('1st parameter must be a type of resource.');
 
         $this->_client = $client;
+        $this->_view = $view;
         $this->setStatus(200);
         $this->setHeaders([
             'Connection'   => 'keep-alive',
@@ -168,6 +176,31 @@ class Response {
             default:
                 return '.html';
         }
+    }
+
+    /**
+     * Send a file content
+     * Set the appropriate MIME type to the HTTP headers
+     * 
+     * @param string $pathfile A file path
+     * 
+     * @throws ResponseException If the file cannot be read
+     * 
+     * @return void
+     */
+    public function render(string $pathfile): void {
+        if (!$this->_view) $realpath = $pathfile;
+        else $realpath = "$this->_view/$pathfile";
+
+        $realpath = str_replace('\\', '/', $realpath);
+
+        if (($content = file_get_contents($realpath)) === FALSE)
+            throw new ResponseException("Could not read $realpath");
+
+        preg_match('/\.(\w)+$/', $pathfile, $ext);
+
+        $this->setHeaders(['Content-Type' => Http::MIMESEXT[$ext[0]]]);
+        $this->send($content, FALSE);
     }
 
     /**

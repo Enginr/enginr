@@ -8,9 +8,9 @@
  * @link https://github.com/Arthuchaut
  */
 
-namespace Enginr\Console;
+namespace Enginr\System;
 
-class Console {
+class System {
     /**
      * Writes data to the standard output
      * 
@@ -18,7 +18,7 @@ class Console {
      * 
      * @return void
      */
-    public static function log($data): void {
+    public static function out($data): void {
         switch (gettype($data)) {
             case 'string':
             case 'boolean':
