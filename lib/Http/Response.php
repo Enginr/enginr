@@ -43,6 +43,13 @@ class Response {
      * @var string A view path root
      */
     private $_view;
+    
+    /**
+     * A boolean that indicate if the HTTP header has sent
+     * 
+     * @var bool A boolean
+     */
+    private $_sent;
 
     /**
      * The response constructor
@@ -59,6 +66,7 @@ class Response {
 
         $this->_client = $client;
         $this->_view = $view;
+        $this->_sent = FALSE;
         $this->setStatus(200);
         $this->setHeaders([
             'Connection'   => 'keep-alive',
@@ -227,7 +235,24 @@ class Response {
      * @return void
      */
     public function end($body = NULL): void {
-        Socket::write($this->_client, $this->_buildHttpResponse($body));
-        Socket::close($this->_client);
+        try {
+            Socket::write($this->_client, $this->_buildHttpResponse($body));
+            Socket::close($this->_client);
+        } catch (\Exception $e) {
+            throw new ResponseException('Cannot send HTTP headers after they had sent.');
+        }
+
+        $this->_sent = TRUE;
+    }
+
+    /**
+     * Return a boolean that say if the HTTP header was sent or not
+     * 
+     * @param void
+     * 
+     * @return bool TRUE if sent, else FALSE
+     */
+    public function isSent(): bool {
+        return $this->_sent;
     }
 }

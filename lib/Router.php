@@ -23,13 +23,6 @@ class Router {
     protected $_routes;
 
     /**
-     * The middlewares array
-     * 
-     * @var array An array of middlewares
-     */
-    protected $_middlewares;
-
-    /**
      * The Router constructor
      * 
      * @param void
@@ -38,38 +31,45 @@ class Router {
      */
     public function __construct() {
         $this->_middlewares = [];
-
-        $this->_routes = [
-            'GET'     => [],
-            'POST'    => [],
-            'PUT'     => [],
-            'DELETE'  => [],
-            'PATCH'   => []
-        ];
+        $this->_routes = [];
     }
 
     /**
-     * Process an HTTP request
-     * Compare the method and uri, and send the appropriate response to the client
+     * 
      * 
      * @param Request $req An HTTP request
      * @param Response $res A response module
      * 
      * @return void
      */
-    protected function _process(Request $req, Response $res): void {
-        if (array_key_exists($req->uri, $this->_routes[$req->method])) {
-            foreach ($this->_middlewares as $middleware)
-                $middleware($req, $res);
+    protected function _process(Request $req, Response $res, $route) {
+        if (!$route) return;
 
-            foreach ($this->_routes[$req->method][$req->uri] as $handler)
-                $handler($req, $res);
-            
+        if (!property_exists($route, 'method')) {
+            foreach ($route->handlers as $handler) {
+                $handler($req, $res, function() use (&$req, &$res) {
+                    $this->_process($req, $res, next($this->_routes));
+                });
+            }
+
             return;
         }
+        
+        if (($route->method === 'ALL' && $route->uri === $req->uri) ||
+           (($route->method === $req->method && $route->uri === $req->uri))) {
+            foreach ($route->handlers as $handler) {
+                $handler($req, $res, function() use (&$req, &$res) {
+                    $this->_process($req, $res, next($this->_routes));
+                });
+            }
+        }
 
-        $res->setStatus(404);
-        $res->send("Cannot $req->method $req->uri");
+        if (!$res->isSent()) {
+            if ($route = next($this->_routes)) return $this->_process($req, $res, $route);
+
+            $res->setStatus(404);
+            $res->send("Cannot $req->method $req->uri");
+        }
     }
 
     /**
@@ -88,12 +88,14 @@ class Router {
         if ($uri[0] !== '/')
             throw new RouterException('The uri must be begin with /');
 
-        foreach ($this->_routes as $method => $uris)
-            $this->_routes[$method][$uri] = $handlers;
+        $this->_routes[] = (object)[
+            'method' => 'ALL',
+            'uri' => $uri,
+            'handlers' => $handlers
+        ];
 
         return $this;
     }
-
 
     /**
      * Add a GET route to the collection
@@ -111,7 +113,11 @@ class Router {
         if ($uri[0] !== '/')
             throw new RouterException('The uri must be begin with /');
 
-        $this->_routes['GET'][$uri] = $handlers;
+        $this->_routes[] = (object)[
+            'method' => 'GET',
+            'uri' => $uri,
+            'handlers' => $handlers
+        ];
 
         return $this;
     }
@@ -217,7 +223,6 @@ class Router {
      * @return void
      */
     private function _addMiddlewares(array $handlers): void {
-        foreach ($handlers as $handler)
-            $this->_middlewares[] = $handler;
+        $this->_routes[] = (object)['handlers' => $handlers];
     }
 }

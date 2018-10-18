@@ -62,7 +62,8 @@ class Enginr extends Router {
         $this->_server->watch(function ($client, string $buffer): void {
             $this->_process(
                 new Request($client, $buffer),
-                new Response($client, $this->_view)
+                new Response($client, $this->_view),
+                reset($this->_routes)
             );
         });
 
