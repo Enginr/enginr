@@ -11,8 +11,9 @@
 namespace Enginr;
 
 use Enginr\{Router, Socket};
-use Enginr\Http\{Request, Response};
+use Enginr\Http\{Http, Request, Response};
 use Enginr\Console\Console;
+use Enginr\Exception\EnginrException;
 
 class Enginr extends Router {
     /**
@@ -58,5 +59,39 @@ class Enginr extends Router {
         });
 
         $this->_server->close();
+    }
+
+    /**
+     * Create a Router with all files that are in the directory specified
+     * 
+     * @param string $path A static file directory path
+     * 
+     * @throws EnginrException If the file cannot be read
+     * 
+     * @return Router The Router created
+     */
+    public static function static(string $path): Router {
+        $router = new Router();
+        $path = str_replace('\\', '/', $path);
+
+        $dir = new \RecursiveDirectoryIterator($path);
+        $iterator = new \RecursiveIteratorIterator($dir);
+        $regex = new \RegexIterator($iterator, '/\.(\w)+$/', \RecursiveRegexIterator::GET_MATCH);
+
+        foreach ($regex as $uri => $object) {
+            $uri = str_replace('\\', '/', $uri);
+            $uri = str_replace($path, '', $uri);
+            preg_match('/\.(\w)+$/', $uri, $ext);
+
+            if (($content = file_get_contents($path . $uri)) === FALSE)
+                throw new EnginrException('Wrong static file path : ' . $path . $uri);
+
+            $router->get($uri, function (Request $req, Response $res) use ($content, $ext) {
+                $res->setHeaders(['Content-Type' => Http::MIMESEXT[$ext[0]]]);
+                $res->send($content, FALSE);
+            });
+        }
+
+        return $router;
     }
 }
