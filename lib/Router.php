@@ -30,7 +30,6 @@ class Router {
      * @return void
      */
     public function __construct() {
-        $this->_middlewares = [];
         $this->_routes = [];
     }
 
@@ -41,11 +40,11 @@ class Router {
      * 
      * @param Request $req An HTTP request
      * @param Response $res A response module
-     * @param array|bool The next routes iteration
+     * @param array|bool $route The next routes iteration
      * 
      * @return void
      */
-    protected function _process(Request $req, Response $res, $route) {
+    protected function _process(Request $req, Response $res, $route): void {
         if (!$route) return;
 
         if (!property_exists($route, 'method')) {
@@ -68,7 +67,10 @@ class Router {
         }
 
         if (!$res->isSent()) {
-            if ($route = next($this->_routes)) return $this->_process($req, $res, $route);
+            if ($route = next($this->_routes)) {
+                $this->_process($req, $res, $route);
+                return;
+            }
 
             $res->setStatus(404);
             $res->send("Cannot $req->method $req->uri");
