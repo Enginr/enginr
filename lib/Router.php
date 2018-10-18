@@ -35,10 +35,13 @@ class Router {
     }
 
     /**
-     * 
+     * Process the HTTP request
+     * Tries to match a route and calls the corresponding handlers.
+     * If the 'next' function is called, the next route will be tested.
      * 
      * @param Request $req An HTTP request
      * @param Response $res A response module
+     * @param array|bool The next routes iteration
      * 
      * @return void
      */
@@ -73,7 +76,7 @@ class Router {
     }
 
     /**
-     * Add handlers to all routes
+     * Add a route of fictive ALL method for listening all methods
      * 
      * @param string $uri An uri to listen
      * @param callable[] $handlers An array of callback functions
@@ -180,9 +183,6 @@ class Router {
     /**
      * Merde a Router with this Router
      * 
-     * (test) If the method and uri already exist,
-     * the handlers will be added the the route
-     * 
      * @see Router::use() method
      * 
      * @param string $ruri A root uri
@@ -198,19 +198,14 @@ class Router {
         
         if (strlen($ruri) === 1) $ruri = '';
 
-        foreach ($router->_routes as $method => $uris) {
-            foreach ($uris as $uri => $handlers) {
-                if (strlen($uri) === 1 && strlen($ruri)) $uri = '';
-
-                if (array_key_exists($ruri . $uri, $this->_routes[$method])) {
-                    foreach ($handlers as $handler)
-                        $this->_routes[$method][$ruri . $uri][] = $handler;
-                } else $this->_routes[$method][$ruri . $uri] = $handlers;
+        foreach ($router->_routes as $route) {
+            if (property_exists($route, 'uri')) {
+                if (strlen($route->uri) === 1 && strlen($ruri)) $route->uri = '';
+                $route->uri = $ruri . $route->uri;
             }
-        }
 
-        foreach ($router->_middlewares as $middleware)
-            $this->_middlewares[] = $middleware;
+            $this->_routes[] = $route;
+        }
     }
 
     /**
