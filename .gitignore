@@ -7,7 +7,6 @@
 
 # Spcific to Enginr
 routes/
-middlewares/
 views/
 public/
 vendor/

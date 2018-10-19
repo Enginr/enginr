@@ -46,7 +46,7 @@ class Router {
      */
     protected function _process(Request $req, Response $res, $route): void {
         if (!$route) return;
-        
+
         $found = FALSE;
 
         // Middleware test

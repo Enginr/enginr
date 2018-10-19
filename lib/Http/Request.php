@@ -28,6 +28,13 @@ class Request {
      * @var string A request URI
      */
     public $uri;
+    
+    /**
+     * The real request uri (not processed)
+     * 
+     * @var string A request uri
+     */
+    public $realuri;
 
     /**
      * The client HTTP version
@@ -101,8 +108,9 @@ class Request {
         $peerName  = Socket::getPeerName($client);
     
         $this->method  = $startline[0];
-        $this->uri     = $startline[1];
+        $this->realuri = $startline[1];
         $this->version = $startline[2];
+        $this->uri     = $this->_parseUri($startline[1]);
         $this->headers = $this->_parseHeaders(array_splice($lines, 1, count($lines)));
         $this->body    = $this->_getBody($buffer);
         $this->host    = $peerName->host;
@@ -125,6 +133,19 @@ class Request {
         }
 
         return $parsedHeaders;
+    }
+
+    /**
+     * Return the uri without query
+     * 
+     * @param string $uri AN uri to parse
+     * 
+     * @return string The uri parsed
+     */
+    private function _parseUri(string $uri): string {
+        preg_match('/^\/((\w)+\/?)*/', $uri, $reguri);
+
+        return $reguri[0];
     }
 
     /**
