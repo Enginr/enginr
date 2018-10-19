@@ -104,7 +104,7 @@ class Request {
         $this->uri     = $startline[1];
         $this->version = $startline[2];
         $this->headers = $this->_parseHeaders(array_splice($lines, 1, count($lines)));
-        $this->body    = $buffer[1];
+        $this->body    = $this->_getBody($buffer);
         $this->host    = $peerName->host;
         $this->port    = $peerName->port;
     }
@@ -125,5 +125,21 @@ class Request {
         }
 
         return $parsedHeaders;
+    }
+
+    /**
+     * Retreive the body message
+     * 
+     * @param array $buffer An array of HTTP buffer
+     * 
+     * @return string The HTTP body
+     */
+    private function _getBody(array $buffer): string {
+        $body = '';
+
+        for ($i = 1; $i < count($buffer); ++$i)
+            $body .= $buffer[$i];
+
+        return $body;
     }
 }

@@ -66,7 +66,7 @@ class Enginr extends Router {
                 reset($this->_routes)
             );
         });
-
+        
         $this->_server->close();
     }
 

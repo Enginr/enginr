@@ -46,6 +46,8 @@ class Router {
      */
     protected function _process(Request $req, Response $res, $route): void {
         if (!$route) return;
+        
+        $found = FALSE;
 
         // Middleware test
         if (!property_exists($route, 'method')) {
@@ -61,6 +63,8 @@ class Router {
         // ALL method or classic methods test
         if (($route->method === 'ALL' && $route->uri === $req->uri) ||
            (($route->method === $req->method && $route->uri === $req->uri))) {
+            $found = TRUE;
+
             foreach ($route->handlers as $handler) {
                 $handler($req, $res, function() use (&$req, &$res) {
                     $this->_process($req, $res, next($this->_routes));
@@ -68,8 +72,8 @@ class Router {
             }
         }
 
-        // If any response was sent ...
-        if (!$res->isSent()) {
+        // If any route matched ...
+        if (!$found) {
             if ($route = next($this->_routes)) {
                 $this->_process($req, $res, $route);
                 return;
@@ -123,6 +127,106 @@ class Router {
 
         $this->_routes[] = (object)[
             'method'   => 'GET',
+            'uri'      => $uri,
+            'handlers' => $handlers
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a POST route to the collection
+     * 
+     * @param string $uri An uri to listen
+     * @param callable[] $handlers An array of callback functions
+     *      @param Request $req An HTTP request
+     *      @param Response $res A response module
+     * 
+     * @throws RouterException If the uri not begin with /
+     * 
+     * @return self
+     */
+    public function post(string $uri, callable ...$handlers): self {
+        if ($uri[0] !== '/')
+            throw new RouterException('The uri must be begin with /');
+
+        $this->_routes[] = (object)[
+            'method'   => 'POST',
+            'uri'      => $uri,
+            'handlers' => $handlers
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a PUT route to the collection
+     * 
+     * @param string $uri An uri to listen
+     * @param callable[] $handlers An array of callback functions
+     *      @param Request $req An HTTP request
+     *      @param Response $res A response module
+     * 
+     * @throws RouterException If the uri not begin with /
+     * 
+     * @return self
+     */
+    public function put(string $uri, callable ...$handlers): self {
+        if ($uri[0] !== '/')
+            throw new RouterException('The uri must be begin with /');
+
+        $this->_routes[] = (object)[
+            'method'   => 'PUT',
+            'uri'      => $uri,
+            'handlers' => $handlers
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a PATCH route to the collection
+     * 
+     * @param string $uri An uri to listen
+     * @param callable[] $handlers An array of callback functions
+     *      @param Request $req An HTTP request
+     *      @param Response $res A response module
+     * 
+     * @throws RouterException If the uri not begin with /
+     * 
+     * @return self
+     */
+    public function patch(string $uri, callable ...$handlers): self {
+        if ($uri[0] !== '/')
+            throw new RouterException('The uri must be begin with /');
+
+        $this->_routes[] = (object)[
+            'method'   => 'PATCH',
+            'uri'      => $uri,
+            'handlers' => $handlers
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a DELETE route to the collection
+     * 
+     * @param string $uri An uri to listen
+     * @param callable[] $handlers An array of callback functions
+     *      @param Request $req An HTTP request
+     *      @param Response $res A response module
+     * 
+     * @throws RouterException If the uri not begin with /
+     * 
+     * @return self
+     */
+    public function delete(string $uri, callable ...$handlers): self {
+        if ($uri[0] !== '/')
+            throw new RouterException('The uri must be begin with /');
+
+        $this->_routes[] = (object)[
+            'method'   => 'DELETE',
             'uri'      => $uri,
             'handlers' => $handlers
         ];
