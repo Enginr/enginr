@@ -12,7 +12,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Enginr\\": "lib/"
+            "Enginr\\": "lib/",
+            "Enginr\\Middleware\\": "middlewares/"
         }
     }
 }
