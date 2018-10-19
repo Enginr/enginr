@@ -22,7 +22,7 @@ class BodyParser {
      * @return object The middleware function
      */
     public static function init(): object {
-        return function (Request $req, Response $res, callable $next): void {    
+        return function (Request $req, Response $res, callable $next) {    
             // POST method process
             if (array_key_exists('Content-Type', $req->headers)) {      
                 if (preg_match( // Url encoded mode

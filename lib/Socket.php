@@ -11,6 +11,7 @@
 namespace Enginr;
 
 use Enginr\Exception\SocketException;
+use Enginr\System\System;
 
 class Socket {
     /**
@@ -71,6 +72,13 @@ class Socket {
     const BUFFER_LEN = 2048;
 
     /**
+     * The time of watch interruption
+     * 
+     * @var int A time in microsecond
+     */
+    const USLEEP = 5000;
+
+    /**
      * The main socket
      * 
      * @var resource A socket
@@ -89,6 +97,8 @@ class Socket {
     public function create(): void {
         if (!$this->_socket = @socket_create(self::DOMAIN, self::TYPE, self::PROTOCOL))
             throw new SocketException(SocketException::err($this->_socket));
+
+        socket_set_nonblock($this->_socket);
     }
 
     /**
@@ -133,17 +143,26 @@ class Socket {
      * @param callable $handler A callback function to process incomming connection
      *      @param resource $client A client requester
      *      @param string $buffer A data sent from the client
+     * @param array $queue A client connections pile
      * 
      * @return void
      */
-    public function watch(callable $handler): void {
+    public function watch(callable $handler, array $queue = []): void {
         if ($client = socket_accept($this->_socket)) {
-            if ($buffer = socket_read($client, self::BUFFER_LEN)) {
-                $handler($client, $buffer);
-            }
+            socket_set_nonblock($client);
+            $queue[] = $client;
         }
 
-        $this->watch($handler);
+        foreach ($queue as $i => $client) {
+            if (is_resource($client)) {
+                if ($buffer = socket_read($client, self::BUFFER_LEN)) {
+                    $handler($client, $buffer);
+                }
+            } else unset($queue[$i]);
+        }
+        
+        usleep(self::USLEEP);
+        $this->watch($handler, $queue);
     }
 
     /**
