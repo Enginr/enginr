@@ -12,7 +12,7 @@ namespace Enginr;
 
 use Enginr\Http\{Request, Response};
 use Enginr\Exception\RouterException;
-use Enginr\System\System;
+use Enginr\System\System; // Just for dev debugging
 
 class Router {
     /**
@@ -47,6 +47,7 @@ class Router {
     protected function _process(Request $req, Response $res, $route): void {
         if (!$route) return;
 
+        // Middleware test
         if (!property_exists($route, 'method')) {
             foreach ($route->handlers as $handler) {
                 $handler($req, $res, function() use (&$req, &$res) {
@@ -57,6 +58,7 @@ class Router {
             return;
         }
         
+        // ALL method or classic methods test
         if (($route->method === 'ALL' && $route->uri === $req->uri) ||
            (($route->method === $req->method && $route->uri === $req->uri))) {
             foreach ($route->handlers as $handler) {
@@ -66,6 +68,7 @@ class Router {
             }
         }
 
+        // If any response was sent ...
         if (!$res->isSent()) {
             if ($route = next($this->_routes)) {
                 $this->_process($req, $res, $route);
@@ -94,8 +97,8 @@ class Router {
             throw new RouterException('The uri must be begin with /');
 
         $this->_routes[] = (object)[
-            'method' => 'ALL',
-            'uri' => $uri,
+            'method'   => 'ALL',
+            'uri'      => $uri,
             'handlers' => $handlers
         ];
 
@@ -119,8 +122,8 @@ class Router {
             throw new RouterException('The uri must be begin with /');
 
         $this->_routes[] = (object)[
-            'method' => 'GET',
-            'uri' => $uri,
+            'method'   => 'GET',
+            'uri'      => $uri,
             'handlers' => $handlers
         ];
 
@@ -147,37 +150,18 @@ class Router {
      *      @param Request An HTTP request
      *      @param Response A response module
      * 
-     * @throws RouterException If the first configuration has only 1 argument
-     * @throws RouterException If the first configuration has not a Router at it second parameter
-     * @throws RouterException If the second configuration has an other type than callable
-     * 
      * @return self
      */
     public function use(/* any */): self {
-        $nargs = func_num_args();
+        $argv = func_get_args();
 
-        if (gettype(func_get_arg(0)) === 'string') {
-            if ($nargs === 1)
-                throw new RouterException('This middleware configuration ' .
-                'need a second parameter that is a Router to work.');
+        // First type of middleware
+        if (count($argv) === 2 && gettype($argv[0]) === 'string')
+            $this->_merge($argv[0], $argv[1]);
 
-            if (gettype(func_get_arg(1)) === 'object' && 
-                get_class(func_get_arg(1)) !== 'Enginr\Router')
-                throw new RouterException('Arg 2 must be a type of Router');
-                
-            $this->_mergeRouters(func_get_arg(0), func_get_arg(1));
-        } else {
-            $handlers = [];
-
-            for ($i = 0; $i < $nargs; ++$i) {
-                if (!is_callable(func_get_arg($i)))
-                    throw new RouterException('This middleware config need a callable to work.');
-    
-                $handlers[] = func_get_arg($i);
-            }
-    
-            $this->_addMiddlewares($handlers);
-        }
+        // Second type of middleware
+        else
+            $this->_addMiddlewares($argv);
 
         return $this;
     }
@@ -194,7 +178,7 @@ class Router {
      * 
      * @return void
      */
-    private function _mergeRouters(string $ruri, Router $router): void {
+    private function _merge(string $ruri, Router $router): void {
         if ($ruri[0] !== '/')
             throw new RouterException('The root uri must be begin with /');
         
@@ -217,9 +201,15 @@ class Router {
      * 
      * @param array $handlers An array of callable
      * 
+     * @throws RouterException If there are a none callable handler
+     * 
      * @return void
      */
     private function _addMiddlewares(array $handlers): void {
+        foreach ($handlers as $handler)
+            if (!is_callable($handler))
+                throw new RouterException('This middleware implementation only needs callables.');
+
         $this->_routes[] = (object)['handlers' => $handlers];
     }
 }

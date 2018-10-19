@@ -12,8 +12,8 @@ namespace Enginr;
 
 use Enginr\{Router, Socket};
 use Enginr\Http\{Http, Request, Response};
-use Enginr\System\System;
 use Enginr\Exception\EnginrException;
+use Enginr\System\System; // Just for dev debugging
 
 class Enginr extends Router {
     /**

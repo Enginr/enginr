@@ -13,7 +13,7 @@ namespace Enginr\Http;
 use Enginr\Socket;
 use Enginr\Http\Http;
 use Enginr\Exception\ResponseException;
-use Enginr\System\System;
+use Enginr\System\System; // Just for dev debugging
 
 class Response {
     /**
