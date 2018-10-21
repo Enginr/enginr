@@ -32,8 +32,14 @@ class Router {
     public function __construct() {
         $this->_routes = [];
 
-        // Default middlewares usage
+        // Use BodyParser middleware for parsing the request queries
         $this->use(\Enginr\Middleware\BodyParser\BodyParser::init());
+
+        // Use Cookie middleware
+        $this->use(\Enginr\Middleware\Cookie\Cookie::init());
+
+        // Use Session middleware
+        $this->use(\Enginr\Middleware\Session\Session::init());
     }
 
     /**
@@ -77,13 +83,10 @@ class Router {
 
         // If any route matched ...
         if (!$found) {
-            if ($route = next($this->_routes)) {
-                $this->_process($req, $res, $route);
-                return;
-            }
-
             $res->setStatus(404);
             $res->send("Cannot $req->method $req->uri");
+
+            if ($route = next($this->_routes)) $this->_process($req, $res, $route);
         }
     }
 
