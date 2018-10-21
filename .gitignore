@@ -10,4 +10,6 @@ routes/
 views/
 public/
 vendor/
+_trash/
 /app.php
+/config.json

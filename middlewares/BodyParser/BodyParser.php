@@ -8,7 +8,7 @@
  * @link https://github.com/Arthuchaut
  */
 
-namespace Enginr\Middleware;
+namespace Enginr\Middleware\BodyParser;
 
 use Enginr\Http\{Http, Request, Response};
 use Enginr\System\System; // For debuging

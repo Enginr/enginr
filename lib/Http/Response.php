@@ -105,10 +105,9 @@ class Response {
      * @return void
      */
     public function setHeaders(array $headers): void {
-        foreach ($headers as $name => $value) {
+        foreach ($headers as $name => $value)
             if (is_int($name))
                 throw new ResponseException('1st parameter must be an associative array.');
-        }
 
         if (is_array($this->_headers))
             $this->_headers = array_merge($this->_headers, $headers);

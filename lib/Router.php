@@ -31,6 +31,9 @@ class Router {
      */
     public function __construct() {
         $this->_routes = [];
+
+        // Default middlewares usage
+        $this->use(\Enginr\Middleware\BodyParser\BodyParser::init());
     }
 
     /**
