@@ -18,14 +18,15 @@ class System {
      * 
      * @return void
      */
-    public static function out($data): void {
+    public static function out($data, bool $crlf = TRUE): void {
         switch (gettype($data)) {
             case 'string':
             case 'boolean':
             case 'double':
             case 'integer':
             case 'NULL':
-                echo "$data\n";
+                echo $data;
+                if ($crlf) echo "\n";
                 break;
             case 'array':
             case 'object':
@@ -34,5 +35,10 @@ class System {
             default:
                 var_dump($data);
         }
+    }
+
+    public static function log($data): void {
+        self::out('[' . date('Y-m-d H:i:s') . '] ', FALSE);
+        self::out($data);
     }
 }

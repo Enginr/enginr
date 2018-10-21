@@ -31,15 +31,6 @@ class Router {
      */
     public function __construct() {
         $this->_routes = [];
-
-        // Use BodyParser middleware for parsing the request queries
-        $this->use(\Enginr\Middleware\BodyParser\BodyParser::init());
-
-        // Use Cookie middleware
-        $this->use(\Enginr\Middleware\Cookie\Cookie::init());
-
-        // Use Session middleware
-        $this->use(\Enginr\Middleware\Session\Session::init());
     }
 
     /**

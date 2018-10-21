@@ -38,9 +38,14 @@ class Enginr extends Router {
      * @return void
      */
     public function __construct() {
+        parent::__construct();
+        
         $this->_server = new Socket();
         $this->_view = '';
-        parent::__construct();
+
+        $this->use(\Enginr\Middleware\BodyParser\BodyParser::init());
+        $this->use(\Enginr\Middleware\Cookie\Cookie::init());
+        $this->use(\Enginr\Middleware\Session\Session::init());
     }
 
     /**
