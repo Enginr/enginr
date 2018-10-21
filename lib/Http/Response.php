@@ -211,7 +211,7 @@ class Response {
      * 
      * @return void
      */
-    public function send($body = NULL, $setContentType = TRUE): void {
+    public function send($body = NULL, bool $setContentType = TRUE): void {
         if ($setContentType)
             $this->setHeaders(['Content-Type' => Http::MIMESEXT[$this->getExt($body)]]);
 
