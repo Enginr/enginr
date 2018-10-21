@@ -12,7 +12,7 @@ namespace Enginr;
 
 use Enginr\Http\{Request, Response};
 use Enginr\Exception\RouterException;
-use Enginr\System\System; // Just for dev debugging
+use Enginr\System\System; // For debugging
 
 class Router {
     /**
@@ -53,10 +53,8 @@ class Router {
      * 
      * @return void
      */
-    protected function _process(Request $req, Response $res, $route): void {
+    protected function _process(Request $req, Response $res, $route, bool $found = FALSE): void {
         if (!$route) return;
-
-        $found = FALSE;
 
         // Middleware test
         if (!property_exists($route, 'method')) {
@@ -68,25 +66,30 @@ class Router {
 
             return;
         }
-        
-        // ALL method or classic methods test
-        if (($route->method === 'ALL' && $route->uri === $req->uri) ||
-           (($route->method === $req->method && $route->uri === $req->uri))) {
-            $found = TRUE;
 
+        // Request route test
+        if (($route->method === 'ALL' && $route->uri === $req->uri) ||
+        (($route->method === $req->method && $route->uri === $req->uri))) {
             foreach ($route->handlers as $handler) {
                 $handler($req, $res, function() use (&$req, &$res) {
-                    $this->_process($req, $res, next($this->_routes));
+                    $this->_process($req, $res, next($this->_routes), TRUE);
                 });
             }
+
+            return;
         }
 
-        // If any route matched ...
+        // Any route matched
+        if ($route = next($this->_routes)) {
+            $this->_process($req, $res, $route, $found);
+
+            return;
+        }
+
+        // Send the 404 status code if any route uri matched
         if (!$found) {
             $res->setStatus(404);
             $res->send("Cannot $req->method $req->uri");
-
-            if ($route = next($this->_routes)) $this->_process($req, $res, $route);
         }
     }
 
