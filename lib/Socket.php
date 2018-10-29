@@ -194,7 +194,7 @@ class Socket {
      * 
      * @return object An object of [host, port]
      */
-    public function getPeerName($socket): object {
+    public static function getPeerName($socket): object {
         $host = null;
         $port = null;
         
@@ -217,7 +217,7 @@ class Socket {
      * 
      * @return void
      */
-    public function close(&$socket = NULL): void {
+    public static function close(&$socket = NULL): void {
         if (!$socket) {
             socket_close($this->_socket);
             $this->_socket = null;

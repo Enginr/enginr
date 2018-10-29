@@ -31,6 +31,13 @@ class Enginr extends Router {
     private $_view;
 
     /**
+     * The template engine used
+     * 
+     * @var string A template engine name
+     */
+    private $_template;
+
+    /**
      * The Enginr constructor
      * 
      * @param void
@@ -42,6 +49,7 @@ class Enginr extends Router {
         
         $this->_server = new Socket();
         $this->_view = '';
+        $this->_template = 'html';
 
         $this->use(\Enginr\Middleware\BodyParser\BodyParser::init());
         $this->use(\Enginr\Middleware\Cookie\Cookie::init());
@@ -67,7 +75,7 @@ class Enginr extends Router {
         $this->_server->watch(function ($client, string $buffer): void {
             $this->_process(
                 new Request($client, $buffer),
-                new Response($client, $this->_view),
+                new Response($client, $this->_view, $this->_template),
                 reset($this->_routes)
             );
         });

@@ -22,7 +22,7 @@ class Cookie {
      * 
      * @return object A callable to use
      */
-    public function init(): object {
+    public static function init(): object {
         return function (Request &$req, Response &$res, callable $next) {
             $req->{'cookie'} = self::_initRequestCookie($req);
             $res->{'cookie'} = self::_initResponseCookie($res);

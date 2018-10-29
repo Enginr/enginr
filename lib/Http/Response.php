@@ -45,6 +45,13 @@ class Response {
     private $_view;
 
     /**
+     * The template engine used
+     * 
+     * @var string A template engine name
+     */
+    private $_template;
+
+    /**
      * The response constructor
      * 
      * @param resource $client A socket resource
@@ -53,12 +60,14 @@ class Response {
      * 
      * @return void
      */
-    public function __construct($client, string $view) {
+    public function __construct($client, string $view, string $template) {
         if (!is_resource($client))
             throw new ResponseException('1st parameter must be a type of resource.');
 
         $this->_client = $client;
         $this->_view = $view;
+        $this->_template = $template;
+
         $this->setStatus(200);
         $this->setHeaders([
             'Connection'   => 'keep-alive',
@@ -178,43 +187,64 @@ class Response {
     }
 
     /**
-     * Send a file content
-     * Set the appropriate MIME type to the HTTP headers
+     * Read or compile the template file to an html content
+     * 
+     * @param string $pathfile A path to the view file
+     * @param array $vars = [] An array of variables for the template engine
+     * 
+     * @throws ResponseException If the file could not be read
+     * 
+     * @return string The html file compiled
+     */
+    private function _renderTemplate(string $pathfile, array $vars = []): string {
+        switch ($this->_template) {
+            case 'pug':
+                $pathfile .= !preg_match("/\.pug$/", $pathfile) ? '.pug' : '';
+
+                if (!$content = (new \Pug\Pug())->render($pathfile, $vars))
+                    throw new ResponseException("Could not read $pathfile");
+
+                return $content;
+                break;
+            case 'html':
+                $pathfile .= !preg_match("/\.html$/", $pathfile) ? '.html' : '';
+
+                if (($content = file_get_contents($pathfile)) === FALSE)
+                    throw new ResponseException("Could not read $pathfile");
+                
+                return $content;
+                break;
+            default:
+                throw new ResponseException("Unknow template engine : $this->_template.");
+        }
+    }
+
+    /**
+     * Send an html file content
      * 
      * @param string $pathfile A file path
-     * 
-     * @throws ResponseException If the file cannot be read
+     * @param array $vars = [] An array of variables for the template engine
      * 
      * @return void
      */
-    public function render(string $pathfile): void {
+    public function render(string $pathfile, array $vars = []): void {
         if (!$this->_view) $realpath = $pathfile;
         else $realpath = "$this->_view/$pathfile";
 
         $realpath = str_replace('\\', '/', $realpath);
 
-        if (($content = file_get_contents($realpath)) === FALSE)
-            throw new ResponseException("Could not read $realpath");
-
-        preg_match('/\.(\w)+$/', $pathfile, $ext);
-
-        $this->setHeaders(['Content-Type' => Http::MIMESEXT[$ext[0]]]);
-        $this->send($content, FALSE);
+        $this->setHeaders(['Content-Type' => Http::MIMESEXT['.html']]);
+        $this->send($this->_renderTemplate($realpath, $vars));
     }
 
     /**
      * Prepare the response and send it
      * 
      * @param mixed (optional) $body A data to send
-     * @param bool (optional) (default = TRUE) $setContentType A bool which specify 
-     *     if the method add the apporpriate Content-Type MIME automaticly
      * 
      * @return void
      */
-    public function send($body = NULL, bool $setContentType = TRUE): void {
-        if ($setContentType)
-            $this->setHeaders(['Content-Type' => Http::MIMESEXT[$this->getExt($body)]]);
-
+    public function send($body = NULL): void {
         $this->end($body);
     }
 
