@@ -72,7 +72,7 @@ class Enginr extends Router {
 
         if ($handler) $handler();
 
-        $this->_server->watch(function ($client, string $buffer): void {
+        $this->_server->watch(function (&$client, string $buffer): void {
             $this->_process(
                 new Request($client, $buffer),
                 new Response($client, $this->_view, $this->_template),
@@ -80,7 +80,7 @@ class Enginr extends Router {
             );
         });
         
-        $this->_server->close();
+        @$this->_server->close();
     }
 
     /**

@@ -60,7 +60,7 @@ class Response {
      * 
      * @return void
      */
-    public function __construct($client, string $view, string $template) {
+    public function __construct(&$client, string $view, string $template) {
         if (!is_resource($client))
             throw new ResponseException('1st parameter must be a type of resource.');
 
@@ -260,7 +260,7 @@ class Response {
     public function end($body = NULL): void {
         try {
             Socket::write($this->_client, $this->_buildHttpResponse($body));
-            Socket::close($this->_client);
+            @Socket::close($this->_client);
         } catch (\Exception $e) {
             throw new ResponseException('Cannot send HTTP headers after they had sent.');
         }

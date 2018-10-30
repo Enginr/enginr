@@ -15,6 +15,13 @@ use Enginr\System\System;
 
 class Socket {
     /**
+     * The server memory limit (in bytes)
+     * 
+     * @var int A Bytes memory size
+     */
+    const MEMORY_LIMIT = 2147483648;
+
+    /**
      * The socket domain
      * 
      * @var int A protocol family 
@@ -97,6 +104,8 @@ class Socket {
     public function create(): void {
         if (!$this->_socket = @socket_create(self::DOMAIN, self::TYPE, self::PROTOCOL))
             throw new SocketException(SocketException::err($this->_socket));
+
+        ini_set('memory_limit', self::MEMORY_LIMIT);
 
         socket_set_nonblock($this->_socket);
     }
@@ -217,10 +226,10 @@ class Socket {
      * 
      * @return void
      */
-    public static function close(&$socket = NULL): void {
+    public function close(&$socket = NULL): void {
         if (!$socket) {
             socket_close($this->_socket);
-            $this->_socket = null;
+            unset($this->_socket);
             return;
         }
 
@@ -228,6 +237,6 @@ class Socket {
             throw new SocketException('1st parameter must be a type of resource.');
 
         socket_close($socket);
-        $socket = null;
+        unset($socket);
     }
 }
