@@ -58,6 +58,13 @@ class Request {
     public $body;
 
     /**
+     * The uri parameters
+     *
+     * @var object An uri parameters
+     */
+    public $params;
+
+    /**
      * The client IP address
      * 
      * @var string An IP address
@@ -113,6 +120,7 @@ class Request {
         $this->uri     = $this->_parseUri($startline[1]);
         $this->headers = $this->_parseHeaders(array_splice($lines, 1, count($lines)));
         $this->body    = $this->_getBody($buffer);
+        $this->params  = (object)[];
         $this->host    = $peerName->host;
         $this->port    = $peerName->port;
     }
