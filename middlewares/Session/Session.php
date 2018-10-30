@@ -26,6 +26,8 @@ class Session {
         $storage = [];
         
         return function (Request &$req, Response &$res, callable $next) use (&$storage) {
+            self::_updateStorage($storage);
+
             if (!$sid = $req->cookie->get('sid'))
                 $sid = self::_create($res, $storage);
             else if (!array_key_exists($sid, $storage))
@@ -55,8 +57,27 @@ class Session {
             'httpOnly' => TRUE
         ]);
 
-        $storage[$uid] = (object)['_id' => $uid];
+        $storage[$uid] = (object)[
+            '_id'  => $uid,
+            'date' => new \DateTime()
+        ];
 
         return $uid;
+    }
+
+    /**
+     * Clean the sessions storage
+     * Unset sessions older than 24 hours
+     *
+     * @param array &$storage A storage address
+     * 
+     * @return void
+     */
+    private static function _updateStorage(array &$storage): void {
+        foreach ($storage as $_id => $session) {
+            if ((new \DateTime())->diff($session->date)->d > 0) {
+                unset($storage[$_id]);
+            }
+        }
     }
 }
