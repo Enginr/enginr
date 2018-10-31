@@ -286,16 +286,14 @@ class Router {
         foreach ($router->_routes as $route) {
             if (property_exists($route, 'uri')) {
                 if (strlen($route->uri->uri) === 1 && strlen($ruri))
-                $route->uri->uri = '';
+                    $route->uri->uri = '';
 
                 $this->_routes[] = $this->_stack(
-                    $route->method, 
+                    $route->method,
                     $ruri . $route->uri->uri, 
                     $route->handlers
                 );
-            } else {
-                $this->_routes[] = $this->_stackMiddlewares($route->handlers);
-            }
+            } else $this->_routes[] = $this->_stackMiddlewares($route->handlers);
         }
     }
 
