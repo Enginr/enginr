@@ -151,7 +151,7 @@ class Request {
      * @return string The uri parsed
      */
     private function _parseUri(string $uri): string {
-        preg_match('/^\/((\w)+\/?)*/', $uri, $reguri);
+        preg_match('/^\/((\w)+\.?\/?)*/', $uri, $reguri);
 
         return $reguri[0];
     }
