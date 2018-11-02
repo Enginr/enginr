@@ -103,14 +103,18 @@ class Enginr extends Router {
         foreach ($regex as $uri => $object) {
             $uri = str_replace('\\', '/', $uri);
             $uri = str_replace($path, '', $uri);
+            $filepath = $path . $uri;
             preg_match('/\.(\w)+$/', $uri, $ext);
+            
+            if (!file_exists($filepath))
+                throw new EnginrException('Wrong static file path : ' . $filepath);
 
-            if (($content = file_get_contents($path . $uri)) === FALSE)
-                throw new EnginrException('Wrong static file path : ' . $path . $uri);
+            $router->get($uri, function (Request $req, Response $res) use ($filepath, $ext) {
+                if (($content = file_get_contents($filepath)) === FALSE)
+                    throw new EnginrException('Could not read file at : ' . $filepath);
 
-            $router->get($uri, function (Request $req, Response $res) use ($content, $ext) {
                 $res->setHeaders(['Content-Type' => Http::MIMESEXT[$ext[0]]]);
-                $res->send($content, FALSE);
+                $res->send($content);
             });
         }
 
