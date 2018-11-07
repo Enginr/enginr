@@ -1,6 +1,10 @@
 
 # Enginr <sup style="font-size:0.4em;font-style:italic">v1.0.\*-alpha</sup>
 
+![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)
+![PHP](https://img.shields.io/badge/php-%3E%3D7.2.0-blue.svg?&style=for-the-badge)
+![RELEASE](https://img.shields.io/badge/pre--release-v1.0.1--alpha-green.svg?style=for-the-badge)
+
 Enginr is a very lightweight micro-framework for writing Web applications or API quickly.  
 
 Strongly inspired by  **Node.js** (and more particularly by its micro-framework **Express.js**), learning how to use it is therefore very simplified if you know these technologies.
