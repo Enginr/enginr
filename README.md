@@ -1,5 +1,10 @@
 # Enginr <sup style="font-size:0.4em;font-style:italic">v1.0.0-Alpha</sup> guide
 
+
+![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)
+![PHP](https://img.shields.io/badge/php-%3E%3D7.2.0-blue.svg?&style=for-the-badge)
+![RELEASE](https://img.shields.io/badge/pre--release-v1.0.1--alpha-green.svg?style=for-the-badge)
+
 - [**Getting started**](#gs)
     - [Introduction](#gs-intro) 
 	- [Installation](#gs-installation)
