@@ -13,11 +13,6 @@ The biggest difference is the use of `$` for your variables... Yey...
 
 :triangular_flag_on_post: **Note :** This guide is for the alpha version. Many changes can be made in the near future.
 
-
-![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)
-![PHP](https://img.shields.io/badge/php-%3E%3D7.2.0-blue.svg?&style=for-the-badge)
-![RELEASE](https://img.shields.io/badge/pre--release-v1.0.1--alpha-green.svg?style=for-the-badge)
-
 - [**Getting started**](#gs)
     - [Installation](#gs-installation)
     - [Hello world](#gs-hello-world)
