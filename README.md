@@ -1,4 +1,13 @@
-# Enginr <sup style="font-size:0.4em;font-style:italic">v1.0.0-Alpha</sup> guide
+
+# Enginr <sup style="font-size:0.4em;font-style:italic">v1.0.\*-alpha</sup>
+
+Enginr is a very lightweight micro-framework for writing Web applications or API quickly.  
+
+Strongly inspired by  **Node.js** (and more particularly by its micro-framework **Express.js**), learning how to use it is therefore very simplified if you know these technologies.
+
+The biggest difference is the use of `$` for your variables... Yey...
+
+:triangular_flag_on_post: **Note :** This guide is for the alpha version. Many changes can be made in the near future.
 
 
 ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)
@@ -6,9 +15,10 @@
 ![RELEASE](https://img.shields.io/badge/pre--release-v1.0.1--alpha-green.svg?style=for-the-badge)
 
 - [**Getting started**](#gs)
-    - [Introduction](#gs-intro) 
-	- [Installation](#gs-installation)
-    - [<span style="color:#00cc00">Hello world</span>](#gs-hello-world)
+    - [Installation](#gs-installation)
+    - [Hello world](#gs-hello-world)
+        - [Using manager (prototype)](#gs-manager)
+        - [From scratch](#gs-from-scratch)
 - [**Routing**](#route)
     - [Introduction](#route-intro)
     - [Usage](#route-usage)
@@ -34,22 +44,16 @@
 
 <h2 id="gs">Getting started</h2>
 
-<h3 id="gs-intro">Introduction</h3>
+This section will show you how to create your first Enginr application.
 
-Enginr is a very lightweight micro-framework for writing Web applications quickly.  
-
-Strongly inspired by  **Node.js** (and more particularly by its micro-framework **Express.js**), learning how to use it is therefore very simplified if you know these technologies.
-
-*The biggest difference is the use of `$` for your variables... Yey...*
-
-<h3 id="gs-installation">Installation</h3>
+<h2 id="gs-installation">Installation</h2>
 
 It is strongly recommended to use `composer` to work with Enginr.
 
 #### Using composer
 
 ```bash
-composer require enginr/enginr
+composer require enginr/enginr:v1.0.*-alpha
 ```
 
 #### Using git
@@ -60,9 +64,39 @@ cd enginr \
 composer update
 ```
 
-<h3 id="gs-hello-world" style="color:#00cc00">Hello world</h3>
+<h2 id="gs-hello-world">Hello world</h2>
 
-Good! The most existing moment... :grin:  
+<h3 id="gs-manager">Using Manager (prototype)</h3>
+
+To easily create an Enginr project, you can use the manager.  
+To use it, start by installing it globally on your machine via composer.  
+
+```bash
+composer global require enginr/manager:dev-master
+```
+
+Once the manager is installed. We will create our first project...
+For this guide, I will call it `myProject`. But you can give it any name you want !
+
+```bash
+enginr create myProject
+```
+You will have to follow a short interactive guide, then once done, your project will be generated !  
+
+Once the generation is complete, go (still in your terminal) to the folder of your project (its name corresponds to the name you gave to your project), then launch the server.
+
+```bash
+cd myProject \
+php app.php
+```
+If your server has started correctly, go to your browser, then enter the address of your server.  
+**Note :** The alpha version of the manager will have given you the address `localhost:8000`.  
+
+You should see the Enginr welcome page !
+
+<h3 id="gs-from-sratch">From scratch</h3>
+
+The most existing moment... :grin:  
 Let's create our first application !
 
 #### 1. Create a new project
@@ -78,7 +112,7 @@ See [installation](#gs-installation) guide.
 
 #### 3. Create the application file
 
-You could named your **application file** like you want. By convention, I will use `app.php` for this tutorial...
+You could named your **application file** like you want. By convention, I will use `app.php` for this guide...
 
 ```bash
 touch app.php
