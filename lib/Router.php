@@ -97,7 +97,7 @@ class Router {
      * @return self
      */
     public function all(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('ALL', $uri, $handlers);
+        $this->_stack('ALL', $uri, $handlers);
 
         return $this;
     }
@@ -113,7 +113,7 @@ class Router {
      * @return self
      */
     public function get(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('GET', $uri, $handlers);
+        $this->_stack('GET', $uri, $handlers);
 
         return $this;
     }
@@ -129,7 +129,7 @@ class Router {
      * @return self
      */
     public function post(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('POST', $uri, $handlers);
+        $this->_stack('POST', $uri, $handlers);
 
         return $this;
     }
@@ -145,7 +145,7 @@ class Router {
      * @return self
      */
     public function put(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('PUT', $uri, $handlers);
+        $this->_stack('PUT', $uri, $handlers);
 
         return $this;
     }
@@ -161,7 +161,7 @@ class Router {
      * @return self
      */
     public function patch(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('PATCH', $uri, $handlers);
+        $this->_stack('PATCH', $uri, $handlers);
 
         return $this;
     }
@@ -177,7 +177,7 @@ class Router {
      * @return self
      */
     public function delete(string $uri, callable ...$handlers): self {
-        $this->_routes[] = $this->_stack('DELETE', $uri, $handlers);
+        $this->_stack('DELETE', $uri, $handlers);
 
         return $this;
     }
@@ -191,13 +191,13 @@ class Router {
      * 
      * @throws RouterException If the uri not begin with '/'
      * 
-     * @return object The route created
+     * @return void
      */
-    private function _stack(string $method, string $uri, array $handlers): object {
+    private function _stack(string $method, string $uri, array $handlers): void {
         if ($uri[0] !== '/')
             throw new RouterException('The uri must be begin with /');
 
-        return (object)[
+        $this->_routes[] = (object)[
             'method' => $method,
             'uri' => (object)[
                 'regex' => '/^' . addcslashes(preg_replace('/:(\w)+/', '(\w)+', $uri), '/') . '$/',
@@ -260,7 +260,7 @@ class Router {
 
         // Second type of middleware
         else
-            $this->_routes[] = $this->_stackMiddlewares($argv);
+            $this->_stackMiddlewares($argv);
 
         return $this;
     }
@@ -288,12 +288,12 @@ class Router {
                 if (strlen($route->uri->uri) === 1 && strlen($ruri))
                     $route->uri->uri = '';
 
-                $this->_routes[] = $this->_stack(
+                $this->_stack(
                     $route->method,
                     $ruri . $route->uri->uri, 
                     $route->handlers
                 );
-            } else $this->_routes[] = $this->_stackMiddlewares($route->handlers);
+            } else $this->_stackMiddlewares($route->handlers);
         }
     }
 
@@ -306,13 +306,13 @@ class Router {
      * 
      * @throws RouterException If there are a none callable handler
      * 
-     * @return object The middlewares
+     * @return void
      */
-    private function _stackMiddlewares(array $handlers): object {
+    private function _stackMiddlewares(array $handlers): void {
         foreach ($handlers as $handler)
             if (!is_callable($handler))
                 throw new RouterException('This middleware implementation only needs callables.');
 
-        return (object)['handlers' => $handlers];
+        $this->_routes[] = (object)['handlers' => $handlers];
     }
 }

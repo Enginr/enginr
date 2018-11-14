@@ -238,31 +238,45 @@ class Response {
     }
 
     /**
-     * Prepare the response and send it
+     * Redirect the client to a specific uri
+     * Send a location header to the HTTP response
      * 
-     * @param mixed (optional) $body A data to send
+     * @param string $uri An HTTP uri
      * 
      * @return void
      */
-    public function send($body = NULL): void {
-        $this->end($body);
+    public function redirect(string $uri): void {
+        $this->setStatus(301);
+        $this->setHeaders(['Location' => $uri]);
+        $this->end();
     }
 
     /**
-     * Send a response to the client, then close the socket
-     *  
-     * @param string $body (optional) A response to send
+     * Prepare the response and send it
+     * 
+     * @param mixed (optional) $body A data to send
      * 
      * @throws ResponseException If the response was already sent
      * 
      * @return void
      */
-    public function end($body = NULL): void {
+    public function send($body = NULL): void {
         try {
             Socket::write($this->_client, $this->_buildHttpResponse($body));
-            @Socket::close($this->_client);
+            $this->end();
         } catch (\Exception $e) {
             throw new ResponseException('Cannot send HTTP headers after they had sent.');
         }
+    }
+
+    /**
+     * Close the client socket
+     * 
+     * @param void
+     * 
+     * @return void
+     */
+    public function end(): void {
+        @Socket::close($this->_client);
     }
 }
