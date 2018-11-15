@@ -71,7 +71,7 @@ class Response {
         $this->setStatus(200);
         $this->setHeaders([
             'Connection'   => 'keep-alive',
-            'Date'         => date('D d M Y H:i:s e'),
+            'Date'         => gmdate('D, d M Y H:i:s T'),
             'Content-Type' => 'text/plain',
             'X-Powered-By' => 'Enginr'
         ]);
