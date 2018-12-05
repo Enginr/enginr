@@ -64,6 +64,8 @@ class Response {
         if (!is_resource($client))
             throw new ResponseException('1st parameter must be a type of resource.');
 
+        setlocale(LC_TIME, 'en_US.utf8');
+
         $this->_client = $client;
         $this->_view = $view;
         $this->_template = $template;
@@ -71,7 +73,10 @@ class Response {
         $this->setStatus(200);
         $this->setHeaders([
             'Connection'   => 'keep-alive',
-            'Date'         => date('D d M Y H:i:s e'),
+            'Date'         => strftime(
+                '%a, %d %b %Y %H:%M:%S GMT', 
+                strtotime(gmdate('Y-m-d H:i:s'))
+            ),
             'Content-Type' => 'text/plain',
             'X-Powered-By' => 'Enginr'
         ]);
