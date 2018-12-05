@@ -28,7 +28,7 @@ class BodyParser {
                 if (preg_match( // Url encoded mode
                     '/application\/x-www-form-urlencoded/', 
                     $req->headers['Content-Type']
-                )) $req->body = self::_parseUrlEncoded($req->$body);
+                )) $req->body = self::_parseUrlEncoded($req->body);
                 
                 if (preg_match( // Form data mode
                     '/multipart\/form-data/', 
