@@ -248,7 +248,7 @@ class Response {
     public function redirect(string $uri): void {
         $this->setStatus(301);
         $this->setHeaders(['Location' => $uri]);
-        $this->end();
+        $this->send();
     }
 
     /**
