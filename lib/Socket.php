@@ -22,6 +22,13 @@ class Socket {
     const MEMORY_LIMIT = 2147483648;
 
     /**
+     * The max calls in memory stack
+     * 
+     * @var int A number of max calls
+     */
+    const MAX_NESTING_LEVEL = -1;
+
+    /**
      * The socket domain
      * 
      * @var int A protocol family 
@@ -102,10 +109,15 @@ class Socket {
      * @return void
      */
     public function create(): void {
+        if (!extension_loaded('sockets'))
+            throw new SocketException('The "sockets" extension is not enabled. ' . 
+                                      'You need to load it in your "php.ini" file.');
+
         if (!$this->_socket = @socket_create(self::DOMAIN, self::TYPE, self::PROTOCOL))
             throw new SocketException(SocketException::err($this->_socket));
 
         ini_set('memory_limit', self::MEMORY_LIMIT);
+        ini_set('xdebug.max_nesting_level', self::MAX_NESTING_LEVEL);
 
         socket_set_nonblock($this->_socket);
     }
