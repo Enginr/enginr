@@ -19,7 +19,7 @@ class Socket {
      * 
      * @var int A Bytes memory size
      */
-    const MEMORY_LIMIT = 2147483648;
+    const MEMORY_LIMIT = 2048000000;
 
     /**
      * The max calls in memory stack
@@ -168,22 +168,27 @@ class Socket {
      * 
      * @return void
      */
-    public function watch(callable $handler, array $queue = []): void {
-        if ($client = socket_accept($this->_socket)) {
-            socket_set_nonblock($client);
-            $queue[] = $client;
-        }
+    public function watch(callable $handler): void {
+        $queue = [];
 
-        foreach ($queue as $i => $client) {
-            if (is_resource($client)) {
-                if ($buffer = socket_read($client, self::BUFFER_LEN)) {
-                    $handler($client, $buffer);
+        while (TRUE) {
+            if ($client = socket_accept($this->_socket)) {
+                socket_set_nonblock($client);
+                $queue[] = $client;
+            }
+    
+            foreach ($queue as $i => $client) {
+                if (is_resource($client)) {
+                    if ($buffer = socket_read($client, self::BUFFER_LEN)) {
+                        $handler($client, $buffer);
+                    }
                 }
-            } else unset($queue[$i]);
+                
+                unset($queue[$i]);
+            }
+            
+            usleep(self::USLEEP);
         }
-        
-        usleep(self::USLEEP);
-        $this->watch($handler, $queue);
     }
 
     /**
